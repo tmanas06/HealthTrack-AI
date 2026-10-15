@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 220 15% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 12%;
+    --primary: 187 79% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 14% 93%;
+    --secondary-foreground: 220 15% 20%;
+    --muted: 210 14% 93%;
+    --muted-foreground: 215 10% 50%;
+    --accent: 187 60% 92%;
+    --accent-foreground: 187 79% 28%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 13% 88%;
+    --input: 214 13% 88%;
+    --ring: 187 79% 36%;
+    --radius: 0.75rem;
+    --chart-1: 187 79% 36%;
+    --chart-2: 210 79% 52%;
+    --chart-3: 147 64% 40%;
+    --chart-4: 43 89% 56%;
+    --chart-5: 0 72% 51%;
+  }
+
+  .dark {
+    --background: 224 24% 8%;
+    --foreground: 210 20% 95%;
+    --card: 224 20% 12%;
+    --card-foreground: 210 20% 95%;
+    --popover: 224 20% 12%;
+    --popover-foreground: 210 20% 95%;
+    --primary: 187 72% 50%;
+    --primary-foreground: 224 24% 8%;
+    --secondary: 215 18% 18%;
+    --secondary-foreground: 210 20% 85%;
+    --muted: 215 18% 18%;
+    --muted-foreground: 215 14% 55%;
+    --accent: 187 50% 18%;
+    --accent-foreground: 187 72% 70%;
+    --destructive: 0 63% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 18% 22%;
+    --input: 215 18% 22%;
+    --ring: 187 72% 50%;
+  }
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+html {
+  scroll-behavior: smooth;
+}
