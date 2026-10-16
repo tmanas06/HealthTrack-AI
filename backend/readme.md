@@ -317,8 +317,8 @@ cd "HealthTrack AI/backend"
 pytest -v
 ```
 
-### Test Coverage Summary (61 Tests Passing):
-- **API Tests (`tests/test_api.py`)**: 20 tests verifying health checks, valid predictions, 422 validations for empty or unrecognized symptoms, CORS headers, and response schema contracts.
+### Test Coverage Summary (66 Tests Passing):
+- **API Tests (`tests/test_api.py`)**: 21 tests verifying health checks, valid predictions, candidate-specific matched symptoms, 422 validations for empty or unrecognized symptoms, CORS headers, and response schema contracts.
 - **Preprocessing Tests (`tests/test_preprocess.py`)**: 27 tests checking symptom whitespace trimming, alias resolution, unseen input rejection, feature vector dimensionality, and round-trip consistency.
 - **Cache Tests (`tests/test_cache.py`)**: 8 tests validating LRU capacity eviction, cache hits, cache misses, stats reporting, and version invalidation.
-- **Recommender Tests (`tests/test_recommender.py`)**: 6 tests validating description lookups, precaution arrays, and missing data fallbacks.
+- **Recommender Tests (`tests/test_recommender.py`)**: 10 tests validating description lookups, precaution arrays, disease symptom mapping, candidate matching symptoms, and missing data fallbacks.

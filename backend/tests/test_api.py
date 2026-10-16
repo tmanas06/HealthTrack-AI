@@ -126,6 +126,21 @@ class TestPredictEndpoint:
         for cand in data["candidates"]:
             assert cand["score_label"] == "model_vote_fraction"
 
+    def test_candidate_specific_matching_symptoms(self, client):
+        resp = client.post(
+            "/api/predict",
+            json={"symptoms": ["itching", "skin_rash", "nodal_skin_eruptions"]},
+        )
+        assert resp.status_code == 200
+        candidates = resp.json()["candidates"]
+        assert len(candidates) >= 2
+        cand_map = {c["condition"]: c for c in candidates}
+        if "Fungal infection" in cand_map:
+            assert "nodal_skin_eruptions" in cand_map["Fungal infection"]["matching_symptoms"]
+        if "Drug Reaction" in cand_map:
+            assert "nodal_skin_eruptions" not in cand_map["Drug Reaction"]["matching_symptoms"]
+
+
 
 class TestCacheBehavior:
     def test_second_request_uses_cache(self, client):

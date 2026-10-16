@@ -64,7 +64,7 @@ HealthTrack AI/
 
 ## Dataset Provenance and Limitations
 
-The four CSV files were obtained from a publicly available medical symptom dataset:
+The four CSV files were obtained from the publicly available [Disease-Symptom Description Dataset](https://www.kaggle.com/datasets/itachi9604/disease-symptom-description-dataset/data) on Kaggle (published under the **CC0: Public Domain** license, permitting open redistribution, commercial, and educational reuse without restriction):
 
 | File | Description |
 |---|---|
@@ -119,7 +119,7 @@ To verify evaluation stability across varying train/test splits, we executed Rep
 
 #### Cross-Validation Configuration & Class Count Limitation
 - **Constraint**: Across the 304 deduplicated records, sample counts per disease range from 5 to 10 (mean = 7.41, std = 1.70). Exactly 8 of the 41 classes have only 5 samples (*Fungal infection, Allergy, AIDS, Gastroenteritis, Paralysis (brain hemorrhage), Heart attack, Acne, Urinary tract infection*).
-- **Limitation**: As a result,  = 5$ is the maximum valid stratified K-fold split where every fold contains at least 1 sample per class. Running a 10-fold stratified CV is mathematically impossible because classes with 5 samples cannot be represented across 10 folds.
+- **Limitation**: As a result, $K = 5$ is the maximum valid stratified K-fold split where every fold contains at least 1 sample per class. Running a 10-fold stratified CV is mathematically impossible because classes with 5 samples cannot be represented across 10 folds.
 
 #### Why the Dataset Yields 100% Accuracy (Dataset Separability Analysis)
 1. **High Proportion of Pathognomonic (Exclusive) Symptoms**:
@@ -274,14 +274,14 @@ cd "HealthTrack AI/backend"
 python3 -m pytest tests/ -v
 ```
 
-61 unit and integration tests covering:
+66 unit and integration tests covering:
 - Symptom normalization and alias handling
 - Vocabulary encode/decode consistency
 - Empty, unknown, duplicate, malformed inputs
 - Feature vector consistency
-- API endpoint validation
+- API endpoint validation and HTTP 422 error contracts
 - Cache hits/misses/eviction/stats
-- Recommender coverage and graceful missing data
+- Recommender coverage, disease symptoms, and candidate-specific matched symptoms
 - Model loading
 
 ### Frontend Tests (Vitest & React Testing Library)
@@ -291,12 +291,12 @@ cd "HealthTrack AI/frontend"
 npm test
 ```
 
-11 unit and component tests covering:
+12 unit and component tests covering:
 - API client methods (`getSymptoms`, `predict`, `checkHealth`), JSON serialization, and error parsing
 - Medical `Disclaimer` presentation and emergency contact warnings
 - `ScoreBar` vote-fraction percentage rendering and ARIA progressbar attributes
 - `ConditionCard` candidate ranking, precaution lists, urgency alerts, and matched symptom chips
-- `SymptomSelector` typeahead search filtering, selection from dropdown, and tag removal
+- `SymptomSelector` typeahead search filtering, selection from dropdown, tag removal, and W3C ARIA combobox keyboard navigation (`ArrowDown`, `Enter`, `Escape`)
 
 ---
 
@@ -318,6 +318,30 @@ npm test
 - The cache stores only anonymized prediction results keyed by a hash of the symptom set.
 - Request logs record only HTTP method, path, status code, and latency — no symptom data.
 - No analytics, telemetry, or third-party services are used.
+
+---
+
+## AI Usage & Verification Disclosure
+
+In accordance with the LaunchBae AI Engineer challenge submission guidelines, this section outlines how AI assistance was utilized throughout the development of HealthTrack AI:
+
+### 1. Assistance Provided by Antigravity (AI Coding Assistant)
+- **Backend Engineering**: Scaffolding the FastAPI service architecture, Pydantic v2 schemas, thread-safe in-memory LRU cache, and request logging middleware.
+- **Machine Learning Pipeline**: Structuring symptom normalization and tokenization pipelines, automated deduplication to eliminate data leakage, Random Forest vs. Logistic Regression model training, and 25-fold Repeated Stratified Cross-Validation scripts.
+- **Frontend Engineering**: Developing the responsive Next.js 16 (Turbopack) and React 19 interface, Tailwind CSS v4 styling, W3C ARIA-compliant combobox interaction pattern, and API rewrite proxy integration.
+- **Automated Test Generation**: Authoring automated pytest unit/integration test suites and Vitest component/accessibility tests.
+- **Documentation**: Drafting technical documentation, architecture diagrams, separability analysis, and API specifications.
+
+### 2. Verification & Human Review
+- **Architectural & Design Decisions**: Reviewed the project specifications, selected the model algorithms, and confirmed the candidate condition ranking and precaution display requirements.
+- **Clinical & Data Quality Review**: Inspected the source dataset, verified the 4,616 duplicate records, and confirmed that synthetic textbook data achieves 100% in-distribution accuracy due to 80 pathognomonic symptoms.
+- **Test Execution & Quality Assurance**: Ran and reviewed the automated backend test suite (66 tests passed), frontend test suite (12 tests passed), ESLint linter (0 errors, 0 warnings), and Next.js Turbopack production build.
+- **Refinements**: Guided the refinement of candidate-specific matching symptom attribution, ensuring candidate condition cards display only symptoms supported by their clinical definitions rather than blanket query lists.
+
+### 3. Model & Application Limitations
+- **Synthetic Dataset**: Trained on textbook rule-derived data with zero diagnostic noise; real patient cases present with comorbidity and stochastic symptoms.
+- **Score Semantics**: Scores represent decision tree vote fractions, not calibrated Bayesian posterior probabilities.
+- **Educational Prototype**: Strictly intended as a technology demonstration, not a medical device.
 
 ---
 

@@ -122,7 +122,7 @@ async def predict(request: PredictRequest) -> PredictResponse:
         known, unknown = validate_and_normalize_symptoms(request.symptoms, model.vocab)
     except ValidationError as exc:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str(exc),
         )
 
@@ -134,7 +134,7 @@ async def predict(request: PredictRequest) -> PredictResponse:
 
     if not known:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=(
                 "None of the provided symptoms are recognized by the model. "
                 f"Unknown symptoms: {unknown}. "
@@ -172,6 +172,7 @@ async def predict(request: PredictRequest) -> PredictResponse:
         condition = item["condition"]
         desc = recommender.get_description(condition)
         precs = recommender.get_precautions(condition)
+        matching_syms = recommender.get_matching_symptoms(condition, known)
 
         # Annotate precautions with urgent guidance if applicable
         all_precs = list(precs)
@@ -186,7 +187,7 @@ async def predict(request: PredictRequest) -> PredictResponse:
                 score_label="model_vote_fraction",
                 description=desc,
                 precautions=all_precs,
-                matching_symptoms=known,
+                matching_symptoms=matching_syms,
             )
         )
 

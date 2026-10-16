@@ -51,3 +51,30 @@ class TestRecommender:
         desc = recommender.get_description("Dimorphic hemmorhoids(piles)")
         # Should return None or empty string, not raise
         assert desc is None or isinstance(desc, str)
+
+    def test_known_disease_symptoms(self, recommender):
+        syms = recommender.get_disease_symptoms("Fungal infection")
+        assert isinstance(syms, set)
+        assert "itching" in syms
+        assert "skin_rash" in syms
+
+    def test_matching_symptoms_filtered(self, recommender):
+        # Fungal infection has itching & skin_rash, but not chest_pain
+        matched = recommender.get_matching_symptoms(
+            "Fungal infection", ["itching", "skin_rash", "chest_pain"]
+        )
+        assert matched == ["itching", "skin_rash"]
+
+    def test_matching_symptoms_no_overlap(self, recommender):
+        # Heart attack does not contain itching or nodal_skin_eruptions
+        matched = recommender.get_matching_symptoms(
+            "Heart attack", ["itching", "nodal_skin_eruptions"]
+        )
+        assert matched == []
+
+    def test_unknown_disease_matching_symptoms_empty(self, recommender):
+        matched = recommender.get_matching_symptoms(
+            "Nonexistent_Disease_XYZ", ["itching", "cough"]
+        )
+        assert matched == []
+
