@@ -133,6 +133,7 @@ export function SymptomSelector({
 }: SymptomSelectorProps) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
   const [activeCategory, setActiveCategory] = useState<string>("Popular");
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -154,6 +155,7 @@ export function SymptomSelector({
     function handleClick(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
+        setActiveIndex(-1);
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -165,6 +167,8 @@ export function SymptomSelector({
       onAdd(symptom);
     }
     setQuery("");
+    setActiveIndex(-1);
+    setOpen(false);
     inputRef.current?.focus();
   }
 
@@ -187,6 +191,39 @@ export function SymptomSelector({
   }
 
   const isAtMax = selected.length >= maxSymptoms;
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (isAtMax) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!open) {
+        setOpen(true);
+        setActiveIndex(0);
+      } else if (filtered.length > 0) {
+        setActiveIndex((prev) => (prev < filtered.length - 1 ? prev + 1 : 0));
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (open && filtered.length > 0) {
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : filtered.length - 1));
+      }
+    } else if (e.key === "Enter") {
+      if (open && activeIndex >= 0 && activeIndex < filtered.length) {
+        e.preventDefault();
+        const chosen = filtered[activeIndex];
+        if (!selected.includes(chosen)) {
+          handleSelect(chosen);
+        }
+      }
+    } else if (e.key === "Escape") {
+      if (open) {
+        e.preventDefault();
+        setOpen(false);
+        setActiveIndex(-1);
+      }
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -236,25 +273,34 @@ export function SymptomSelector({
             id="symptom-search"
             ref={inputRef}
             type="text"
+            role="combobox"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
               setOpen(true);
+              setActiveIndex(-1);
             }}
-            onFocus={() => setOpen(true)}
+            onFocus={() => {
+              setOpen(true);
+              setActiveIndex(-1);
+            }}
+            onKeyDown={handleKeyDown}
             placeholder={isAtMax ? `Maximum ${maxSymptoms} symptoms selected` : "Type to search symptoms..."}
             disabled={isAtMax}
             className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-10 pr-10 text-sm text-slate-800 placeholder-slate-400 shadow-sm transition-all focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-100 disabled:cursor-not-allowed disabled:opacity-60"
             autoComplete="off"
             aria-autocomplete="list"
             aria-controls="symptom-dropdown"
-            aria-expanded={open}
+            aria-expanded={open && filtered.length > 0 && !isAtMax}
+            aria-haspopup="listbox"
+            aria-activedescendant={open && activeIndex >= 0 ? `symptom-option-${activeIndex}` : undefined}
           />
           {query && (
             <button
               type="button"
               onClick={() => {
                 setQuery("");
+                setActiveIndex(-1);
                 inputRef.current?.focus();
               }}
               className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600"
@@ -275,16 +321,21 @@ export function SymptomSelector({
             className="absolute z-50 mt-1.5 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl ring-1 ring-black/5"
           >
             <ul className="max-h-60 overflow-y-auto py-1">
-              {filtered.map((symptom) => {
+              {filtered.map((symptom, index) => {
                 const isSelected = selected.includes(symptom);
+                const isActive = activeIndex === index;
                 return (
                   <li
                     key={symptom}
+                    id={`symptom-option-${index}`}
                     role="option"
-                    aria-selected={isSelected}
+                    aria-selected={isSelected || isActive}
                     onClick={() => !isSelected && handleSelect(symptom)}
+                    onMouseEnter={() => setActiveIndex(index)}
                     className={`flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm transition-colors ${
-                      isSelected
+                      isActive
+                        ? "bg-teal-50/90 text-teal-800"
+                        : isSelected
                         ? "cursor-default bg-teal-50/70 text-teal-700 font-medium"
                         : "text-slate-700 hover:bg-slate-50"
                     }`}

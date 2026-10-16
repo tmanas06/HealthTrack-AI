@@ -135,5 +135,37 @@ describe("Frontend Components", () => {
       fireEvent.click(removeBtn);
       expect(onRemove).toHaveBeenCalledWith("itching");
     });
+
+    it("supports keyboard navigation (ArrowDown, Enter, Escape) in combobox", () => {
+      const onAdd = vi.fn();
+      const onRemove = vi.fn();
+
+      render(
+        <SymptomSelector
+          allSymptoms={symptoms}
+          selected={[]}
+          onAdd={onAdd}
+          onRemove={onRemove}
+        />
+      );
+
+      const input = screen.getByRole("combobox", { name: /search symptoms/i });
+      fireEvent.focus(input);
+      expect(input).toHaveAttribute("aria-expanded", "true");
+
+      // Navigate down to first item and select with Enter
+      fireEvent.keyDown(input, { key: "ArrowDown" });
+      expect(input).toHaveAttribute("aria-activedescendant", "symptom-option-0");
+
+      fireEvent.keyDown(input, { key: "Enter" });
+      expect(onAdd).toHaveBeenCalledWith("itching");
+
+      // Test Escape closes dropdown
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: "rash" } });
+      expect(input).toHaveAttribute("aria-expanded", "true");
+      fireEvent.keyDown(input, { key: "Escape" });
+      expect(input).toHaveAttribute("aria-expanded", "false");
+    });
   });
 });

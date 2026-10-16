@@ -196,7 +196,7 @@ All frontend components and client functions are covered by automated tests in [
 npm test
 ```
 
-### Test Coverage Breakdown (11 Tests Passing):
+### Test Coverage Breakdown (12 Tests Passing):
 
 #### 1. API Client Suite ([`__tests__/api.test.ts`](__tests__/api.test.ts) - 4 tests)
 - `getSymptoms`: Verifies symptom vocabulary fetching and header serialization.
@@ -204,7 +204,7 @@ npm test
 - `checkHealth`: Validates system status verification and model version checks.
 - `HTTP Error Handling`: Ensures backend 422 error details are extracted and converted to user-friendly exceptions.
 
-#### 2. Components Suite ([`__tests__/components.test.tsx`](__tests__/components.test.tsx) - 7 tests)
+#### 2. Components Suite ([`__tests__/components.test.tsx`](__tests__/components.test.tsx) - 8 tests)
 - `Disclaimer`: Confirms prominent rendering of emergency contact warnings and prototype alerts.
 - `ScoreBar`: Verifies ARIA `progressbar` attributes (`aria-valuenow`, `aria-valuemin`, `aria-valuemax`) and score formatting.
 - `ConditionCard`: Tests candidate title, rank `#1` badge, description, precaution lists, and matching symptom chips.
@@ -212,6 +212,7 @@ npm test
 - `SymptomSelector (Search & Filter)`: Validates that typing into the search input dynamically filters dropdown suggestions.
 - `SymptomSelector (Add Symptom)`: Tests that clicking a symptom in the dropdown triggers `onAdd` with the canonical identifier.
 - `SymptomSelector (Remove Symptom)`: Verifies that clicking the remove button on a selected tag triggers `onRemove`.
+- `SymptomSelector (Keyboard Navigation)`: Verifies W3C ARIA combobox keyboard navigation (`ArrowDown`, `Enter`, `Escape`) and `aria-activedescendant` updates.
 
 ---
 
