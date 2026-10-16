@@ -323,25 +323,54 @@ npm test
 
 ## AI Usage & Verification Disclosure
 
-In accordance with the LaunchBae AI Engineer challenge submission guidelines, this section outlines how AI assistance was utilized throughout the development of HealthTrack AI:
+### 1. AI-Assisted Development
 
-### 1. Assistance Provided by Antigravity (AI Coding Assistant)
-- **Backend Engineering**: Scaffolding the FastAPI service architecture, Pydantic v2 schemas, thread-safe in-memory LRU cache, and request logging middleware.
-- **Machine Learning Pipeline**: Structuring symptom normalization and tokenization pipelines, automated deduplication to eliminate data leakage, Random Forest vs. Logistic Regression model training, and 25-fold Repeated Stratified Cross-Validation scripts.
-- **Frontend Engineering**: Developing the responsive Next.js 16 (Turbopack) and React 19 interface, Tailwind CSS v4 styling, W3C ARIA-compliant combobox interaction pattern, and API rewrite proxy integration.
-- **Automated Test Generation**: Authoring automated pytest unit/integration test suites and Vitest component/accessibility tests.
-- **Documentation**: Drafting technical documentation, architecture diagrams, separability analysis, and API specifications.
+Antigravity was used as an AI coding assistant throughout the development of HealthTrack AI.
 
-### 2. Verification & Human Review
-- **Architectural & Design Decisions**: Reviewed the project specifications, selected the model algorithms, and confirmed the candidate condition ranking and precaution display requirements.
-- **Clinical & Data Quality Review**: Inspected the source dataset, verified the 4,616 duplicate records, and confirmed that synthetic textbook data achieves 100% in-distribution accuracy due to 80 pathognomonic symptoms.
-- **Test Execution & Quality Assurance**: Ran and reviewed the automated backend test suite (66 tests passed), frontend test suite (12 tests passed), ESLint linter (0 errors, 0 warnings), and Next.js Turbopack production build.
-- **Refinements**: Guided the refinement of candidate-specific matching symptom attribution, ensuring candidate condition cards display only symptoms supported by their clinical definitions rather than blanket query lists.
+AI assistance contributed to:
 
-### 3. Model & Application Limitations
-- **Synthetic Dataset**: Trained on textbook rule-derived data with zero diagnostic noise; real patient cases present with comorbidity and stochastic symptoms.
-- **Score Semantics**: Scores represent decision tree vote fractions, not calibrated Bayesian posterior probabilities.
-- **Educational Prototype**: Strictly intended as a technology demonstration, not a medical device.
+* **Backend development**: FastAPI architecture, request validation, Pydantic schemas, caching, and logging.
+* **Machine learning**: Symptom preprocessing, dataset deduplication, Random Forest and Logistic Regression training pipelines, and cross-validation scripts.
+* **Frontend development**: Next.js and React components, symptom selection, API integration, loading states, and accessibility improvements.
+* **Testing**: Initial development of backend unit and integration tests, as well as frontend component tests.
+* **Documentation**: Drafting architecture documentation, API specifications, model evaluation explanations, and setup instructions.
+
+AI-generated code was treated as a starting point for implementation and review rather than as evidence of correctness.
+
+### 2. Technical Review and Verification
+
+The project was reviewed and evaluated against the challenge requirements.
+
+Key verification activities included:
+
+* **Dataset analysis**: Examined the original 4,920 records, identified 4,616 duplicate rows, and evaluated the implications of reducing the dataset to 304 unique symptom-disease combinations.
+* **Model evaluation**: Reviewed Random Forest and Logistic Regression performance using repeated stratified cross-validation and investigated why both models achieved perfect scores on the synthetic dataset.
+* **Inference consistency**: Verified that training and inference use the same symptom normalization and ordered feature vocabulary.
+* **Backend correctness**: Tested input validation, prediction ranking, candidate-specific symptom matching, caching, and error handling.
+* **Frontend correctness**: Tested symptom selection, keyboard interactions, API error handling, and result rendering.
+* **Automated verification**: Executed 66 backend tests, 12 frontend tests, ESLint, and the Next.js production build.
+
+These results demonstrate performance on the available dataset and software tests; they do not establish clinical diagnostic accuracy.
+
+### 3. Engineering Decisions and Trade-offs
+
+The implementation uses a conventional machine learning pipeline rather than relying on an LLM to generate diagnoses.
+
+Key design decisions include:
+
+* Using scikit-learn for reproducible model training and inference.
+* Separating preprocessing, model training, API inference, and recommendation logic.
+* Maintaining a fixed symptom vocabulary to ensure consistent feature encoding.
+* Using a version-aware in-memory cache for repeated prediction requests.
+* Returning ranked candidate conditions while explicitly identifying the limitations of the model scores.
+* Keeping medical recommendations separate from the classifier and displaying an appropriate safety disclaimer.
+
+### 4. Limitations
+
+* The model was trained on a synthetic, rule-derived symptom-disease dataset.
+* Perfect classification performance on this dataset does not establish real-world diagnostic reliability.
+* Random Forest vote fractions are not calibrated disease probabilities.
+* The application is an educational engineering prototype, not a clinically validated diagnostic system.
 
 ---
 
