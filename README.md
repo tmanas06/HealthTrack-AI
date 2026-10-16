@@ -56,6 +56,10 @@ HealthTrack AI/
     └── hooks/useAssessment.ts # Assessment state hook
 ```
 
+> 📖 **Detailed Subsystem Documentation**:
+> - 🐍 [**Backend & Machine Learning Guide (FastAPI, Scikit-Learn, Pytest)**](backend/README.md)
+> - ⚛️ [**Frontend Application Guide (Next.js 16, Tailwind CSS v4, Vitest)**](frontend/README.md)
+
 ---
 
 ## Dataset Provenance and Limitations
@@ -97,16 +101,40 @@ Split:        Stratified 80/20 on deduplicated dataset (304 records)
 Features:     131-dimensional multi-hot binary vector (symptom presence)
 ```
 
-### Evaluation Metrics (on deduplicated test set, n=61)
+### Single Split Evaluation (Deduplicated Test Set, n=61)
 
 | Model | Accuracy | Macro F1 | Top-3 Accuracy | Per-Class Recall (Avg) |
 |---|---|---|---|---|
-| Random Forest (Primary) | 1.000 | 1.000 | 1.000 | 1.000 (all 41 classes) |
-| Logistic Regression (Baseline) | 1.000 | 1.000 | 1.000 | 1.000 (all 41 classes) |
+| Random Forest (Primary, n_estimators=200) | 1.000 | 1.000 | 1.000 | 1.000 (all 41 classes) |
+| Logistic Regression (Baseline, C=1.0) | 1.000 | 1.000 | 1.000 | 1.000 (all 41 classes) |
 
-> **Preventing Data Leakage**: The stratified 80/20 train/test split was strictly applied to the **304 deduplicated records** (243 train, 61 test) rather than the raw 4,920 records. Splitting the raw data would have caused 93.8% of test records to be identical copies of training records, creating artificial test leakage.
+### Repeated Stratified Cross-Validation (5 Folds × 5 Repeats = 25 Folds, 1,520 Predictions)
+
+To verify evaluation stability across varying train/test splits, we executed Repeated Stratified K-Fold Cross Validation (`RepeatedStratifiedKFold(n_splits=5, n_repeats=5, random_state=42)`):
+
+| Model | Mean Accuracy | Std Dev (Acc) | Mean Macro F1 | Std Dev (F1) | Total Misclassifications |
+|---|---|---|---|---|---|
+| **Random Forest** | **1.0000** | **0.0000** | **1.0000** | **0.0000** | **0 / 1,520** |
+| **Logistic Regression** | **1.0000** | **0.0000** | **1.0000** | **0.0000** | **0 / 1,520** |
+
+#### Cross-Validation Configuration & Class Count Limitation
+- **Constraint**: Across the 304 deduplicated records, sample counts per disease range from 5 to 10 (mean = 7.41, std = 1.70). Exactly 8 of the 41 classes have only 5 samples (*Fungal infection, Allergy, AIDS, Gastroenteritis, Paralysis (brain hemorrhage), Heart attack, Acne, Urinary tract infection*).
+- **Limitation**: As a result,  = 5$ is the maximum valid stratified K-fold split where every fold contains at least 1 sample per class. Running a 10-fold stratified CV is mathematically impossible because classes with 5 samples cannot be represented across 10 folds.
+
+#### Why the Dataset Yields 100% Accuracy (Dataset Separability Analysis)
+1. **High Proportion of Pathognomonic (Exclusive) Symptoms**:
+   - Out of 131 total symptoms in the vocabulary, **80 symptoms appear exclusively in one disease** (61.1%).
+   - **32 out of 41 diseases** contain at least one symptom unique to that disease. When any of these symptoms is present, classification is deterministic.
+2. **Orthogonal Combinations for Non-Exclusive Diseases**:
+   - For the remaining 9 diseases (*Chronic cholestasis, Jaundice, Malaria, Chicken pox, hepatitis A, Hepatitis C, Hepatitis D, Heart attack, Hyperthyroidism*), their symptom profiles are distinguished by a **minimum Hamming distance of 2.0** (i.e. at least 2 distinct binary feature differences from any other condition).
+3. **Absence of Label Noise**:
+   - The dataset was created by combinatorially sampling predetermined symptom lists from clinical textbook definitions. Because there are no mislabeled records, atypical patient presentations, or stochastic noise, the classes are completely linearly and decision-tree separable.
+4. **Split Invariance**:
+   - Tested under 5-fold, 3-fold, and 2-fold cross-validation (training on just 50% of the data), both Random Forest and Logistic Regression consistently achieve 100% accuracy with zero variance.
+
+> **Preventing Data Leakage**: All cross-validation and splits are performed strictly on the **304 deduplicated records**. Splitting the raw 4,920-row file would leak identical copies of 93.8% of samples across folds.
 >
-> **Important Caveat**: While both models achieve perfect scores on this held-out deduplicated split, these metrics solely measure in-distribution classification on synthetic data where combinations are distinct. They **must not** be interpreted as clinical diagnostic reliability or real-world accuracy.
+> **Clinical Validity Warning**: A score of 100% accuracy on synthetic, noise-free data reflects in-distribution rule recovery. In real clinical medicine, patient presentations are ambiguous, comorbid, and variable. This model must NEVER be used for clinical diagnosis.
 
 ---
 
