@@ -12,10 +12,9 @@ interface SymptomSelectorProps {
   maxSymptoms?: number;
 }
 
-const CATEGORIES: Record<string, { label: string; icon: string; symptoms: string[] }> = {
+const CATEGORIES: Record<string, { label: string; symptoms: string[] }> = {
   Popular: {
     label: "Common",
-    icon: "🌟",
     symptoms: [
       "fatigue",
       "high_fever",
@@ -34,7 +33,6 @@ const CATEGORIES: Record<string, { label: string; icon: string; symptoms: string
   },
   Respiratory: {
     label: "Respiratory",
-    icon: "🫁",
     symptoms: [
       "cough",
       "breathlessness",
@@ -49,7 +47,6 @@ const CATEGORIES: Record<string, { label: string; icon: string; symptoms: string
   },
   Digestive: {
     label: "Digestive",
-    icon: "🍽️",
     symptoms: [
       "abdominal_pain",
       "nausea",
@@ -64,8 +61,7 @@ const CATEGORIES: Record<string, { label: string; icon: string; symptoms: string
     ],
   },
   Neurological: {
-    label: "Neuro / Body",
-    icon: "🧠",
+    label: "Neuro & Body",
     symptoms: [
       "headache",
       "joint_pain",
@@ -79,8 +75,7 @@ const CATEGORIES: Record<string, { label: string; icon: string; symptoms: string
     ],
   },
   Skin: {
-    label: "Skin / Allergy",
-    icon: "🧬",
+    label: "Skin & Allergy",
     symptoms: [
       "itching",
       "skin_rash",
@@ -98,22 +93,18 @@ const CATEGORIES: Record<string, { label: string; icon: string; symptoms: string
 const PRESETS = [
   {
     name: "Common Cold",
-    icon: "🤧",
     symptoms: ["continuous_sneezing", "chills", "fatigue", "cough", "high_fever", "headache"],
   },
   {
     name: "Allergic Reaction",
-    icon: "🌿",
     symptoms: ["continuous_sneezing", "shivering", "chills", "watering_from_eyes"],
   },
   {
     name: "Migraine Attack",
-    icon: "⚡",
     symptoms: ["headache", "acidity", "indigestion", "blurred_and_distorted_vision", "excessive_hunger"],
   },
   {
     name: "Skin Infection",
-    icon: "🩹",
     symptoms: ["itching", "skin_rash", "nodal_skin_eruptions", "dischromic__patches"],
   },
 ];
@@ -226,47 +217,32 @@ export function SymptomSelector({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Quick Test Presets */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Quick Examples (Click to test)
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {PRESETS.map((preset) => (
-            <button
-              key={preset.name}
-              type="button"
-              onClick={() => {
-                if (onSelectPreset) {
-                  onSelectPreset(preset.symptoms);
-                } else {
-                  handleClearAll();
-                  preset.symptoms.forEach((s) => {
-                    if (allSymptoms.includes(s)) onAdd(s);
-                  });
-                }
-              }}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/80 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition-all hover:border-teal-300 hover:bg-teal-50/70 hover:text-teal-700 hover:shadow"
-            >
-              <span>{preset.icon}</span>
-              <span>{preset.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Search Input Box */}
+    <div className="space-y-5">
+      {/* Search Input Combobox */}
       <div ref={containerRef} className="relative">
-        <label htmlFor="symptom-search" className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label
+          htmlFor="symptom-search"
+          className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-stone-600"
+        >
           Search symptoms
         </label>
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center">
-            <svg className="h-4 w-4 text-teal-600" width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <div className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-stone-400">
+            <svg
+              className="h-4 w-4"
+              width={16}
+              height={16}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
           </div>
           <input
@@ -285,15 +261,21 @@ export function SymptomSelector({
               setActiveIndex(-1);
             }}
             onKeyDown={handleKeyDown}
-            placeholder={isAtMax ? `Maximum ${maxSymptoms} symptoms selected` : "Type to search symptoms..."}
+            placeholder={
+              isAtMax
+                ? `Maximum ${maxSymptoms} symptoms selected`
+                : "Type to search symptoms (e.g. fever, headache, cough)..."
+            }
             disabled={isAtMax}
-            className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-10 pr-10 text-sm text-slate-800 placeholder-slate-400 shadow-sm transition-all focus:border-teal-500 focus:outline-none focus:ring-4 focus:ring-teal-100 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-lg border border-stone-300 bg-white py-2.5 pl-10 pr-10 text-sm text-stone-900 placeholder-stone-400 shadow-2xs transition-colors focus:border-[#1b4332] focus:outline-none focus:ring-1 focus:ring-[#1b4332] disabled:cursor-not-allowed disabled:bg-stone-50"
             autoComplete="off"
             aria-autocomplete="list"
             aria-controls="symptom-dropdown"
             aria-expanded={open && filtered.length > 0 && !isAtMax}
             aria-haspopup="listbox"
-            aria-activedescendant={open && activeIndex >= 0 ? `symptom-option-${activeIndex}` : undefined}
+            aria-activedescendant={
+              open && activeIndex >= 0 ? `symptom-option-${activeIndex}` : undefined
+            }
           />
           {query && (
             <button
@@ -303,24 +285,38 @@ export function SymptomSelector({
                 setActiveIndex(-1);
                 inputRef.current?.focus();
               }}
-              className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600"
+              className="absolute inset-y-0 right-3 flex items-center text-stone-400 hover:text-stone-600"
+              aria-label="Clear search input"
             >
-              <svg className="h-4 w-4" width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="h-4 w-4"
+                width={16}
+                height={16}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           )}
         </div>
 
-        {/* Dropdown list */}
+        {/* Combobox Dropdown */}
         {open && filtered.length > 0 && !isAtMax && (
           <div
             id="symptom-dropdown"
             role="listbox"
             aria-label="Symptom suggestions"
-            className="absolute z-50 mt-1.5 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl ring-1 ring-black/5"
+            className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white py-1 shadow-md ring-1 ring-black/5"
           >
-            <ul className="max-h-60 overflow-y-auto py-1">
+            <ul>
               {filtered.map((symptom, index) => {
                 const isSelected = selected.includes(symptom);
                 const isActive = activeIndex === index;
@@ -332,24 +328,21 @@ export function SymptomSelector({
                     aria-selected={isSelected || isActive}
                     onClick={() => !isSelected && handleSelect(symptom)}
                     onMouseEnter={() => setActiveIndex(index)}
-                    className={`flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                    className={`flex cursor-pointer items-center justify-between px-3.5 py-2 text-xs sm:text-sm transition-colors ${
                       isActive
-                        ? "bg-teal-50/90 text-teal-800"
+                        ? "bg-[#eef3ef] text-[#1b4332]"
                         : isSelected
-                        ? "cursor-default bg-teal-50/70 text-teal-700 font-medium"
-                        : "text-slate-700 hover:bg-slate-50"
+                        ? "bg-stone-50 text-stone-400 cursor-default"
+                        : "text-stone-800 hover:bg-stone-50"
                     }`}
                   >
-                    <span>{formatSymptomLabel(symptom)}</span>
+                    <span className={isSelected ? "line-through text-stone-400" : ""}>
+                      {formatSymptomLabel(symptom)}
+                    </span>
                     {isSelected ? (
-                      <span className="flex items-center gap-1 text-xs text-teal-600">
-                        <svg className="h-4 w-4" width={16} height={16} fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        Selected
-                      </span>
+                      <span className="text-[11px] font-medium text-stone-400">Added</span>
                     ) : (
-                      <span className="text-xs text-slate-400">Click to add</span>
+                      <span className="text-[11px] text-stone-400">+ Add</span>
                     )}
                   </li>
                 );
@@ -359,38 +352,37 @@ export function SymptomSelector({
         )}
       </div>
 
-      {/* Category Tabs & Quick-Select Pills */}
-      <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Browse by Category
+      {/* Category Filter & Quick Browsing */}
+      <div className="rounded-lg border border-stone-200 bg-stone-50/60 p-3.5">
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="text-xs font-semibold uppercase tracking-wider text-stone-600">
+            Browse by Clinical Category
           </span>
-          <span className="text-xs text-slate-400">
-            Click to toggle symptom
+          <span className="text-[11px] text-stone-400 hidden sm:inline">
+            Click to add or remove
           </span>
         </div>
 
-        {/* Category Pills */}
-        <div className="flex flex-wrap gap-1.5 mb-3.5 pb-2 border-b border-slate-200/60">
+        {/* Category Tabs */}
+        <div className="flex flex-wrap gap-1.5 pb-2.5 border-b border-stone-200/60 mb-2.5">
           {Object.entries(CATEGORIES).map(([key, cat]) => (
             <button
               key={key}
               type="button"
               onClick={() => setActiveCategory(key)}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
+              className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                 activeCategory === key
-                  ? "bg-teal-600 text-white shadow-sm"
-                  : "bg-white text-slate-600 hover:bg-slate-200/80 border border-slate-200/60"
+                  ? "bg-[#1b4332] text-white shadow-2xs"
+                  : "bg-white text-stone-600 border border-stone-200 hover:bg-stone-100"
               }`}
             >
-              <span>{cat.icon}</span>
-              <span>{cat.label}</span>
+              {cat.label}
             </button>
           ))}
         </div>
 
         {/* Symptoms in Active Category */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {CATEGORIES[activeCategory]?.symptoms.map((symptom) => {
             const isSelected = selected.includes(symptom);
             return (
@@ -399,21 +391,19 @@ export function SymptomSelector({
                 type="button"
                 onClick={() => handleToggle(symptom)}
                 disabled={!isSelected && isAtMax}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
+                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                   isSelected
-                    ? "bg-teal-600 text-white shadow-sm shadow-teal-200 hover:bg-teal-700"
-                    : "bg-white text-slate-700 border border-slate-200 hover:border-teal-300 hover:bg-teal-50/40 hover:text-teal-700"
-                } ${!isSelected && isAtMax ? "opacity-40 cursor-not-allowed" : ""}`}
+                    ? "bg-[#1b4332] text-white shadow-2xs hover:bg-[#143225]"
+                    : "bg-white text-stone-700 border border-stone-200 hover:border-stone-300 hover:bg-stone-50"
+                } ${!isSelected && isAtMax ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 <span>{formatSymptomLabel(symptom)}</span>
                 {isSelected ? (
-                  <svg className="h-3 w-3" width={12} height={12} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-3 w-3" width={12} height={12} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
-                  <svg className="h-3 w-3 text-slate-400" width={12} height={12} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+                  <span className="text-stone-400 font-normal">+</span>
                 )}
               </button>
             );
@@ -421,12 +411,40 @@ export function SymptomSelector({
         </div>
       </div>
 
-      {/* Selected symptoms tray */}
-      <div className="space-y-2">
+      {/* Quick Test Scenarios */}
+      <div className="pt-1">
+        <span className="text-xs font-semibold uppercase tracking-wider text-stone-500 block mb-1.5">
+          Example Presentations (Click to load)
+        </span>
+        <div className="flex flex-wrap gap-1.5">
+          {PRESETS.map((preset) => (
+            <button
+              key={preset.name}
+              type="button"
+              onClick={() => {
+                if (onSelectPreset) {
+                  onSelectPreset(preset.symptoms);
+                } else {
+                  handleClearAll();
+                  preset.symptoms.forEach((s) => {
+                    if (allSymptoms.includes(s)) onAdd(s);
+                  });
+                }
+              }}
+              className="inline-flex items-center rounded-md border border-stone-200 bg-white px-2.5 py-1 text-xs font-medium text-stone-600 hover:border-[#1b4332]/40 hover:bg-[#eef3ef] hover:text-[#1b4332] transition-colors"
+            >
+              {preset.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Selected Symptoms Tray */}
+      <div className="space-y-2 pt-2 border-t border-stone-200/70">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-slate-700">
+          <span className="text-xs font-semibold uppercase tracking-wider text-stone-700">
             Selected symptoms{" "}
-            <span className="ml-1 rounded-full bg-teal-100 px-2 py-0.5 text-xs font-semibold text-teal-800">
+            <span className="ml-1 rounded-full bg-[#eef3ef] text-[#1b4332] px-2 py-0.5 text-xs font-bold border border-[#d2dfd4]">
               {selected.length}
             </span>
           </span>
@@ -434,7 +452,7 @@ export function SymptomSelector({
             <button
               type="button"
               onClick={handleClearAll}
-              className="text-xs text-slate-400 hover:text-red-600 transition-colors"
+              className="text-xs text-stone-500 underline hover:text-red-700 transition-colors"
             >
               Clear all
             </button>
@@ -442,30 +460,45 @@ export function SymptomSelector({
         </div>
 
         {selected.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/40 py-8 text-center">
-            <svg className="mx-auto h-8 w-8 text-slate-300 mb-2" width={32} height={32} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p className="text-sm text-slate-500 font-medium">No symptoms selected yet</p>
-            <p className="text-xs text-slate-400 mt-1">Use the search above or click any category to add symptoms</p>
+          <div className="rounded-lg border border-dashed border-stone-200 bg-stone-50/50 p-4 text-center">
+            <p className="text-xs text-stone-500">
+              No symptoms selected yet. Use the search above or select from the clinical categories.
+            </p>
           </div>
         ) : (
-          <div role="list" aria-label="Selected symptoms" className="flex flex-wrap gap-2">
+          <div
+            role="list"
+            aria-label="Selected symptoms"
+            className="flex flex-wrap gap-1.5"
+          >
             {selected.map((symptom) => (
               <div
                 key={symptom}
                 role="listitem"
-                className="group flex items-center gap-1.5 rounded-full border border-teal-200 bg-gradient-to-r from-teal-50 to-cyan-50/80 px-3 py-1.5 text-sm font-medium text-teal-800 shadow-sm transition-all hover:border-teal-300 hover:shadow"
+                className="inline-flex items-center gap-1.5 rounded-md border border-[#c8d8cb] bg-[#eef3ef] px-2.5 py-1 text-xs font-medium text-[#1b4332]"
               >
                 <span>{formatSymptomLabel(symptom)}</span>
                 <button
                   type="button"
                   aria-label={`Remove ${formatSymptomLabel(symptom)}`}
                   onClick={() => onRemove(symptom)}
-                  className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full text-teal-400 hover:bg-teal-200 hover:text-teal-800 focus:outline-none focus:ring-1 focus:ring-teal-400 transition-colors"
+                  className="flex h-3.5 w-3.5 items-center justify-center rounded text-[#1b4332]/70 hover:bg-[#d8e7dc] hover:text-[#1b4332] focus:outline-none focus:ring-1 focus:ring-[#1b4332]"
                 >
-                  <svg className="h-3 w-3" width={12} height={12} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="h-3 w-3"
+                    width={12}
+                    height={12}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
